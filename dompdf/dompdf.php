@@ -2,7 +2,7 @@
 /**
  * Command line utility to use dompdf.
  * Can also be used with HTTP GET parameters
- * 
+ *
  * @package dompdf
  * @link    http://dompdf.github.com/
  * @author  Benj Carson <benjcarson@digitaljunkies.ca>
@@ -14,9 +14,9 @@
  */
 function dompdf_usage() {
   $default_paper_size = DOMPDF_DEFAULT_PAPER_SIZE;
-  
+
   echo <<<EOD
-  
+
 Usage: {$_SERVER["argv"][0]} [options] html_file
 
 html_file can be a filename, a url if fopen_wrappers are enabled, or the '-' character to read from standard input.
@@ -24,25 +24,25 @@ html_file can be a filename, a url if fopen_wrappers are enabled, or the '-' cha
 Options:
  -h             Show this message
  -l             List available paper sizes
- -p size        Paper size; something like 'letter', 'A4', 'legal', etc.  
+ -p size        Paper size; something like 'letter', 'A4', 'legal', etc.
                   The default is '$default_paper_size'
  -o orientation Either 'portrait' or 'landscape'.  Default is 'portrait'
- -b path        Set the 'document root' of the html_file.  
-                  Relative urls (for stylesheets) are resolved using this directory.  
+ -b path        Set the 'document root' of the html_file.
+                  Relative urls (for stylesheets) are resolved using this directory.
                   Default is the directory of html_file.
  -f file        The output filename.  Default is the input [html_file].pdf
  -v             Verbose: display html parsing warnings and file not found errors.
- -d             Very verbose: display oodles of debugging output: every frame 
+ -d             Very verbose: display oodles of debugging output: every frame
                   in the tree printed to stdout.
  -t             Comma separated list of debugging types (page-break,reflow,split)
- 
+
 EOD;
 exit;
 }
 
 /**
  * Parses command line options
- * 
+ *
  * @return array The command line options
  */
 function getoptions() {
@@ -186,7 +186,7 @@ switch ( $sapi ) {
       $types[ trim($type) ] = 1;
     $_DOMPDF_DEBUG_TYPES = $types;
   }
-  
+
   $save_file = true;
 
   break;
@@ -197,28 +197,28 @@ switch ( $sapi ) {
     $file = rawurldecode($_GET["input_file"]);
   else
     throw new DOMPDF_Exception("An input file is required (i.e. input_file _GET variable).");
-  
+
   if ( isset($_GET["paper"]) )
     $paper = rawurldecode($_GET["paper"]);
   else
     $paper = DOMPDF_DEFAULT_PAPER_SIZE;
-  
+
   if ( isset($_GET["orientation"]) )
     $orientation = rawurldecode($_GET["orientation"]);
   else
     $orientation = "portrait";
-  
+
   if ( isset($_GET["base_path"]) ) {
     $base_path = rawurldecode($_GET["base_path"]);
     $file = $base_path . $file; # Set the input file
-  }  
-  
+  }
+
   if ( isset($_GET["options"]) ) {
     $options = $_GET["options"];
   }
-  
+
   $file_parts = explode_url($file);
-  
+
   /* Check to see if the input file is local and, if so, that the base path falls within that specified by DOMDPF_CHROOT */
   if(($file_parts['protocol'] == '' || $file_parts['protocol'] === 'file://')) {
     $file = realpath($file);
@@ -226,14 +226,14 @@ switch ( $sapi ) {
       throw new DOMPDF_Exception("Permission denied on $file. The file could not be found under the directory specified by DOMPDF_CHROOT.");
     }
   }
-  
+
   if($file_parts['protocol'] === 'php://') {
     throw new DOMPDF_Exception("Permission denied on $file. This script does not allow PHP streams.");
   }
-  
+
   $outfile = "dompdf_out.pdf"; # Don't allow them to set the output file
   $save_file = false; # Don't save the file
-  
+
   break;
 }
 
@@ -283,6 +283,7 @@ if ( $save_file ) {
   file_put_contents($outfile, $dompdf->output( array("compress" => 0) ));
   exit(0);
 }
+
 
 if ( !headers_sent() ) {
   $dompdf->stream($outfile, $options);
